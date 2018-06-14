@@ -24,10 +24,14 @@ namespace SecureTravel
         {
             InitializeComponent();
         }
-
+        private AfterLogin afterlogin; 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             String username=Username.Text;
+            String password = TPassword.Password;
+            afterlogin = new AfterLogin(username,password);
+            afterlogin.Show();
+            this.Close();
         }
 
         private void User_Lost_Focus(object sender, RoutedEventArgs e)
