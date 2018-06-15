@@ -21,6 +21,7 @@ namespace SecureTravel
     {
         private OpenMessage openmessage;
         private AfterLogin currentwindow;
+        private ComposeMessage composemessage;
         public AfterLogin(String username, String password)
         {
             InitializeComponent();
@@ -52,9 +53,14 @@ namespace SecureTravel
             openmessage = new OpenMessage(currentwindow);
             openmessage.Show();
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
 
+        private void Compose_Message(object sender, RoutedEventArgs e)
+        {
+            currentwindow = this;
+            currentwindow.Hide();
+            composemessage = new ComposeMessage(currentwindow);
+            composemessage.Show();
         }
+
     }
 }
