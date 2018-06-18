@@ -20,9 +20,15 @@ namespace SecureTravel
     public partial class ComposeMessage : Window
     {
         private AfterLogin previouswindow;
-        public ComposeMessage(AfterLogin prev_window)
+        private SecurityController securecontroller = new SecurityController();
+        String username, password;
+        public ComposeMessage(String username,String password,AfterLogin prev_window, String subject = "Subject", String content = "Your Message goes here...")
         {
             InitializeComponent();
+            this.username = username;
+            this.password = password;
+            original_message.Text = content;
+            this.subject.Text = subject;
             previouswindow = prev_window;
         }
 
@@ -90,9 +96,15 @@ namespace SecureTravel
         {
             if (((Button)sender).Content.Equals("Encrypt and Send") == true)
             {
+                if((original_message.Text).Equals("Your Message goes here...") ==true)
+                {
+                    //Type message alert
+                    return;
+                }
                 original_message.IsReadOnly = true;
-                //Encrypt Logic
+                String encrypted=securecontroller.Encrypt(password, original_message.Text);
                 encrypted_message.Visibility = Visibility.Visible;
+                encrypted_message.Text = encrypted;
                 send_button.Visibility = Visibility.Visible;
                 encrypt_button.Content = "Edit";
             }

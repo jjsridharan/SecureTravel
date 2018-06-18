@@ -20,9 +20,13 @@ namespace SecureTravel
     public partial class OpenMessage : Window
     {
         private AfterLogin previouswindow;
-        public OpenMessage(AfterLogin prev_window)
+        private ComposeMessage composemessage;
+        String username, password;
+        public OpenMessage(String username,String password,AfterLogin prev_window)
         {
             InitializeComponent();
+            this.username = username;
+            this.password = password;
             previouswindow = prev_window;
         }
 
@@ -39,7 +43,9 @@ namespace SecureTravel
 
         private void Forward_Mail(object sender, RoutedEventArgs e)
         {
-
+            composemessage = new ComposeMessage(username,password,previouswindow,"Subject","Content");
+            composemessage.Show();
+            this.Hide();
         }
     }
 }

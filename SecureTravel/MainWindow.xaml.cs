@@ -27,7 +27,7 @@ namespace SecureTravel
         private AfterLogin afterlogin; 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            String username=Username.Text;
+            String username = Username.Text;
             String password = TPassword.Password;
             afterlogin = new AfterLogin(username,password);
             afterlogin.Show();

@@ -22,6 +22,7 @@ namespace SecureTravel
         private OpenMessage openmessage;
         private AfterLogin currentwindow;
         private ComposeMessage composemessage;
+        String username, password;
         public AfterLogin(String username, String password)
         {
             InitializeComponent();
@@ -37,6 +38,8 @@ namespace SecureTravel
                 obutton.HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 obutton.VerticalAlignment = VerticalAlignment.Top;
                 obutton.Click += action_clicked;
+                this.username = username;
+                this.password = password;
                 this.grid.Children.Add(obutton);
 
             }
@@ -50,7 +53,7 @@ namespace SecureTravel
         {
             currentwindow = this;
             currentwindow.Hide();
-            openmessage = new OpenMessage(currentwindow);
+            openmessage = new OpenMessage(username,password,currentwindow);
             openmessage.Show();
         }
 
@@ -58,9 +61,13 @@ namespace SecureTravel
         {
             currentwindow = this;
             currentwindow.Hide();
-            composemessage = new ComposeMessage(currentwindow);
+            composemessage = new ComposeMessage(username,password,currentwindow);
             composemessage.Show();
         }
-
+        private void Logout(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            new MainWindow().Show();
+        }
     }
 }
