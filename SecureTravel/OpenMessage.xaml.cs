@@ -43,9 +43,8 @@ namespace SecureTravel
 
         private void Forward_Mail(object sender, RoutedEventArgs e)
         {
-            composemessage = new ComposeMessage(username,password,previouswindow,"Subject","Content");
-            composemessage.Show();
-            this.Hide();
+            new ComposeMessage(username, password, previouswindow, "Subject", "Content").Show();
+            this.Close();
         }
     }
 }

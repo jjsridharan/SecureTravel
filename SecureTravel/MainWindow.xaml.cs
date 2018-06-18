@@ -72,5 +72,16 @@ namespace SecureTravel
                 TPassword.Focus();
             }
         }
+
+        private void Signup(object sender, RoutedEventArgs e)
+        {
+            new Signup().Show();
+            this.Close();
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

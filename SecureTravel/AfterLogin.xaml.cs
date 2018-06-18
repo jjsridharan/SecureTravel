@@ -66,8 +66,8 @@ namespace SecureTravel
         }
         private void Logout(object sender, RoutedEventArgs e)
         {
-            this.Hide();
             new MainWindow().Show();
+            this.Close();
         }
     }
 }
