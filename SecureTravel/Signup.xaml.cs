@@ -11,14 +11,20 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace SecureTravel
 {
     /// <summary>
     /// Interaction logic for Signup.xaml
     /// </summary>
+    
     public partial class Signup : Window
     {
+        private IMongoClient Client;
+        private IMongoDatabase Database;
+        private IMongoCollection<BsonDocument> Collection;
         public Signup()
         {
             InitializeComponent();
@@ -96,7 +102,26 @@ namespace SecureTravel
         }
         private void User_Signup(object e, RoutedEventArgs senders)
         {
-            //Signup Logic
+            String username = this.username.Text;
+            String mailid = this.mailid.Text;
+            String password = this.Opassword.Password;
+            Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
+            Database = Client.GetDatabase("securetravel");
+            Collection = Database.GetCollection<BsonDocument>("user");
+            var builder = Builders<BsonDocument>.Filter;
+            var filter = builder.Eq("username", username);
+            var results = Collection.Find(filter).ToList();
+            Console.Write(results.ToJson());
+            if (results.Count == 0)
+            {
+                var document = new BsonDocument{
+                    { "username" , username},
+                    { "mailid" , mailid },
+                    { "password", password }
+                };
+                Collection.InsertOne(document);
+                Console.WriteLine("Inserted");
+            }
         }
     }
 }
