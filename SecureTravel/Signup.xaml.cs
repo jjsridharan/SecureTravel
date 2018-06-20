@@ -1,30 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Timers;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace SecureTravel
 {
     /// <summary>
     /// Interaction logic for Signup.xaml
     /// </summary>
-    
+
     public partial class Signup : Window
     {
         private IMongoClient Client;
         private IMongoDatabase Database;
         private IMongoCollection<BsonDocument> Collection;
+        private Timer timer = new Timer()
+        {
+            Interval = 3000 // it will Tick in 3 seconds
+        };
         public Signup()
         {
             InitializeComponent();
@@ -100,18 +98,52 @@ namespace SecureTravel
                 OCpassword.Focus();
             }
         }
-        private void User_Signup(object e, RoutedEventArgs senders)
+        private void DisplayWarning(String message)
         {
+            warning.Content = message;
+            warning.Visibility = Visibility.Visible;            
+            timer.Elapsed += (s, en) => {
+                warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Hidden));
+                timer.Stop(); };
+            timer.Start();
+        }
+        public static bool IsValidEmail(string email)
+        {
+            Regex rx = new Regex(
+            @"^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z{|}~])*@[a-zA-Z](-?[a-zA-Z0-9])*(\.[a-zA-Z](-?[a-zA-Z0-9])*)+$");
+            return rx.IsMatch(email);
+        }
+        private void User_Signup(object e, RoutedEventArgs senders)
+        {           
             String username = this.username.Text;
             String mailid = this.mailid.Text;
             String password = this.Opassword.Password;
+            if(username.Equals("Username"))
+            {
+                DisplayWarning("Username is empty");
+                return;
+            }
+            if (mailid.Equals("Mail Id") || !IsValidEmail(mailid))
+            {
+                DisplayWarning("Mail id Is not valid");
+                return;
+            }
+            if (password.Length<9)
+            {
+                DisplayWarning("password should be atleas eight charcters");
+                return;
+            }
+            if (password.Equals(OCpassword.Password)==false)
+            {
+                DisplayWarning("Password and confirm password are not same");
+                return;
+            }
             Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
             Database = Client.GetDatabase("securetravel");
             Collection = Database.GetCollection<BsonDocument>("user");
             var builder = Builders<BsonDocument>.Filter;
-            var filter = builder.Eq("username", username);
+            var filter = builder.Eq("mailid", mailid);
             var results = Collection.Find(filter).ToList();
-            Console.Write(results.ToJson());
             if (results.Count == 0)
             {
                 var document = new BsonDocument{
@@ -120,7 +152,11 @@ namespace SecureTravel
                     { "password", password }
                 };
                 Collection.InsertOne(document);
-                Console.WriteLine("Inserted");
+                DisplayWarning("Account Successfully Created! Login to send messages");
+            }
+            else
+            {
+                DisplayWarning("Mail id already exists");
             }
         }
     }

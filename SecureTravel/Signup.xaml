@@ -7,14 +7,15 @@
         mc:Ignorable="d"
         Title="Secure Travel : Signup" Background="Azure">
     <Grid Margin="0,0,0,-0.2" Width="518">
-        <Label Content="SignUp Form" HorizontalAlignment="Left" Margin="233,36,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="mailid" HorizontalAlignment="Left" Height="23" Margin="169,97,0,0" TextWrapping="Wrap" Text="Mail Id" VerticalAlignment="Top" Width="273" GotFocus="mailid_got_focus" LostFocus="mailid_lost_focus"/>
-        <TextBox x:Name="username" HorizontalAlignment="Left" Height="23" Margin="257,158,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Width="120" GotFocus="username_got_focus" LostFocus="username_lost_focus"/>
-        <PasswordBox Visibility="Hidden" HorizontalAlignment="Left" Height="23" Margin="257,220,0,0" VerticalAlignment="Top" Width="120"  LostFocus="Opassword_lost_focus" x:Name="Opassword"/>
-        <PasswordBox Visibility="Hidden" HorizontalAlignment="Left" Height="23" Margin="257,283,0,0" VerticalAlignment="Top" Width="120"  LostFocus="OCpassword_lost_focus" x:Name="OCpassword"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="257,220,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="120" GotFocus="password_got_focus" x:Name="Password"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="257,283,0,0" TextWrapping="Wrap" Text="Confirm Password" VerticalAlignment="Top" Width="120" GotFocus="Cpassword_got_focus" x:Name="CPassword"/>
-        <Button Content="Signup" HorizontalAlignment="Left" Margin="292,334,0,0" VerticalAlignment="Top" Width="47" RenderTransformOrigin="-0.211,0.334" Click="User_Signup"/>
+        <Label Content="SignUp Form" HorizontalAlignment="Left" Margin="249,33,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="mailid" HorizontalAlignment="Left" Height="23" Margin="187,97,0,0" TextWrapping="Wrap" Text="Mail Id" VerticalAlignment="Top" Width="223" GotFocus="mailid_got_focus" LostFocus="mailid_lost_focus"/>
+        <TextBox x:Name="username" HorizontalAlignment="Left" Height="23" Margin="187,158,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Width="223" GotFocus="username_got_focus" LostFocus="username_lost_focus"/>
+        <PasswordBox Visibility="Hidden" HorizontalAlignment="Left" Height="23" Margin="187,220,0,0" VerticalAlignment="Top" Width="223"  LostFocus="Opassword_lost_focus" x:Name="Opassword"/>
+        <PasswordBox Visibility="Hidden" HorizontalAlignment="Left" Height="23" Margin="187,283,0,0" VerticalAlignment="Top" Width="223"  LostFocus="OCpassword_lost_focus" x:Name="OCpassword"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="187,220,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="223" GotFocus="password_got_focus" x:Name="Password"/>
+        <TextBox HorizontalAlignment="Left" Height="23" Margin="187,283,0,0" TextWrapping="Wrap" Text="Confirm Password" VerticalAlignment="Top" Width="223" GotFocus="Cpassword_got_focus" x:Name="CPassword"/>
+        <Button Content="Signup" HorizontalAlignment="Left" Margin="265,340,0,0" VerticalAlignment="Top" Width="47" RenderTransformOrigin="-0.211,0.334" Click="User_Signup"/>
         <Button Content="Back to Login" HorizontalAlignment="Left" Margin="-97,39,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="-0.228,0.14" Click="Login"/>
+        <Label x:Name="warning" Visibility="Hidden"  Content="Processing Request..." HorizontalAlignment="Left" Margin="187,419,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
