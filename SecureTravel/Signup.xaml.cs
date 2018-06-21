@@ -98,13 +98,15 @@ namespace SecureTravel
                 OCpassword.Focus();
             }
         }
-        private void DisplayWarning(String message)
+        private void DisplayWarning(String message, int Interval = 3000)
         {
-            warning.Content = message;
-            warning.Visibility = Visibility.Visible;            
+            timer.Interval = Interval;
+            warning.Dispatcher.Invoke(new Action(() => warning.Content = message));
+            warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Visible));
             timer.Elapsed += (s, en) => {
                 warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Hidden));
-                timer.Stop(); };
+                timer.Stop();
+            };
             timer.Start();
         }
         public static bool IsValidEmail(string email)
@@ -113,12 +115,17 @@ namespace SecureTravel
             @"^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z{|}~])*@[a-zA-Z](-?[a-zA-Z0-9])*(\.[a-zA-Z](-?[a-zA-Z0-9])*)+$");
             return rx.IsMatch(email);
         }
-        private void User_Signup(object e, RoutedEventArgs senders)
-        {           
-            String username = this.username.Text;
-            String mailid = this.mailid.Text;
-            String password = this.Opassword.Password;
-            if(username.Equals("Username"))
+        private void Handle()
+        {
+            String username = "";
+            this.username.Dispatcher.Invoke(new Action(() => username = this.username.Text));
+            String mailid = "";
+            this.mailid.Dispatcher.Invoke(new Action(() => mailid = this.mailid.Text));
+            String password = "";
+            Opassword.Dispatcher.Invoke(new Action(() => password = Opassword.Password));
+            String opassword = "";
+            OCpassword.Dispatcher.Invoke(new Action(() => opassword = OCpassword.Password));
+            if (username.Equals("Username"))
             {
                 DisplayWarning("Username is empty");
                 return;
@@ -128,12 +135,12 @@ namespace SecureTravel
                 DisplayWarning("Mail id Is not valid");
                 return;
             }
-            if (password.Length<9)
+            if (password.Length < 9)
             {
                 DisplayWarning("password should be atleas eight charcters");
                 return;
             }
-            if (password.Equals(OCpassword.Password)==false)
+            if (password.Equals(opassword) == false)
             {
                 DisplayWarning("Password and confirm password are not same");
                 return;
@@ -158,6 +165,11 @@ namespace SecureTravel
             {
                 DisplayWarning("Mail id already exists");
             }
+        }
+        private void User_Signup(object e, RoutedEventArgs senders)
+        {
+            DisplayWarning("Processing your request", 300000);
+            Task.Run(() => Handle());
         }
     }
 }

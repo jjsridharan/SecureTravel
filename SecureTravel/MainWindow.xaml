@@ -7,12 +7,13 @@
         mc:Ignorable="d"
         Title="Secure Travel"         Background="Azure">
     <Grid Margin="0,0,0,-0.2" Width="518">
-        <Button Background="DarkGray" Content="Login" HorizontalAlignment="Left" Margin="266,228,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Button x:Name="Loginbt" Background="DarkGray" Content="Login" HorizontalAlignment="Left" Margin="266,228,0,0" VerticalAlignment="Top" Width="75" Click="Login"/>
         <Label Content="Secure Travel" HorizontalAlignment="Left" FontSize="30" FontWeight="UltraLight" FontStyle="Oblique"  Margin="207,23,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="Username" Height="35" HorizontalAlignment="Left"  Margin="161,92,0,0" TextWrapping="Wrap" ToolTip="Registerd Username" GotFocus="User_Got_Focus" VerticalAlignment="Top" Width="273" Text="Username" FontSize="20" FontWeight="ExtraLight" RenderTransformOrigin="-0.207,-0.023" LostFocus="User_Lost_Focus"/>
+        <TextBox x:Name="Email" Height="35" HorizontalAlignment="Left"  Margin="161,92,0,0" TextWrapping="Wrap" ToolTip="Registerd Username" GotFocus="User_Got_Focus" VerticalAlignment="Top" Width="273" Text="Email Id" FontSize="20" FontWeight="ExtraLight" RenderTransformOrigin="-0.207,-0.023" LostFocus="User_Lost_Focus"/>
         <TextBox x:Name="Password" Height="35" Text="Password" HorizontalAlignment="Left" ToolTip="Password for the username"  Margin="161,164,0,0" VerticalAlignment="Top" GotFocus="Password_Got_Focus"  FontSize="20" FontWeight="ExtraLight" Width="273"  />
         <PasswordBox x:Name="TPassword" Height="35" Visibility="Hidden" ToolTip="Password for the username" HorizontalAlignment="Left"  Margin="161,164,0,0" VerticalAlignment="Top" Width="273" LostFocus="Password_Lost_Focus" />
         <Button Content="Signup" HorizontalAlignment="Left" Margin="393,274,0,0" VerticalAlignment="Top" Width="41" Click="Signup"/>
-        <Button Content="Forgot Password?" HorizontalAlignment="Left" Margin="161,274,0,0" VerticalAlignment="Top" Width="101" Click="Button_Click_2"/>
+        <Button Content="Forgot Password?" HorizontalAlignment="Left" Margin="161,274,0,0" VerticalAlignment="Top" Width="101" />
+        <Label x:Name="warning" Visibility="Hidden" Content="Label"  HorizontalAlignment="Left" Margin="161,344,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.464,-4.359"/>
     </Grid>
 </Window>

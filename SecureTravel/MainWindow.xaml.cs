@@ -1,8 +1,11 @@
-﻿using System;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,22 +27,72 @@ namespace SecureTravel
         {
             InitializeComponent();
         }
-        private AfterLogin afterlogin; 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private AfterLogin afterlogin;
+        private Timer timer = new Timer()
         {
-            String username = Username.Text;
-            String password = TPassword.Password;
-            afterlogin = new AfterLogin(username,password);
-            afterlogin.Show();
-            this.Close();
+            Interval = 3000 // it will Tick in 3 seconds
+        };
+        private IMongoClient Client;
+        private IMongoDatabase Database;
+        private IMongoCollection<BsonDocument> Collection;
+        List<BsonDocument> results;
+        private void DisplayWarning(String message,int Interval=3000)
+        {
+            timer.Interval = Interval;
+            warning.Dispatcher.Invoke(new Action(() => warning.Content = message));            
+            warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Visible));
+            timer.Elapsed += (s, en) => {
+                warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Hidden));
+                timer.Stop();
+            };
+            timer.Start();
+        }
+        private void Handle()
+        {
+            String email = "";
+            Email.Dispatcher.Invoke(new Action(() => email = Email.Text));
+            String password = "";
+            TPassword.Dispatcher.Invoke(new Action(() => password = TPassword.Password));
+            if (SecureTravel.Signup.IsValidEmail(email) == false)
+            {
+                DisplayWarning("Not a valid Mail id!");
+                return;
+            }
+            if (password.Equals(""))
+            {
+                DisplayWarning("Password is empty!");             
+                return;
+            }
+            Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
+            Database = Client.GetDatabase("securetravel");
+            Collection = Database.GetCollection<BsonDocument>("user");
+            var builder = Builders<BsonDocument>.Filter;
+            var filter = builder.Eq("mailid", email) & builder.Eq("password", password);
+            results = Collection.Find(filter).ToList();
+            Console.Write(results);
+            if (results.Count == 1)
+            {
+                this.Dispatcher.Invoke(new Action(()=>afterlogin = new AfterLogin(email, password)));
+                afterlogin.Dispatcher.Invoke(new Action(() => afterlogin.Show()));
+                this.Dispatcher.Invoke(new Action(() => this.Close()));                
+            }
+            else
+            {
+                DisplayWarning("Mail id or Password is wrong");
+            }
+        }
+        private void Login(object sender, RoutedEventArgs e)
+        {
+            DisplayWarning("Processing your request....",30000);
+            Task.Run(()=>Handle());           
         }
 
         private void User_Lost_Focus(object sender, RoutedEventArgs e)
         {
-            String username = ((TextBox)sender).Text;
-            if(username.Equals("")==true)
+            String email = ((TextBox)sender).Text;
+            if(email.Equals("")==true)
             {
-                ((TextBox)sender).Text = "Username";
+                ((TextBox)sender).Text = "Email Id";
             }
         }
 
@@ -56,8 +109,8 @@ namespace SecureTravel
 
         private void User_Got_Focus(object sender, RoutedEventArgs e)
         {
-            String username = ((TextBox)sender).Text;
-            if (username.Equals("Username") == true)
+            String email = ((TextBox)sender).Text;
+            if (email.Equals("Email Id") == true)
             {
                 ((TextBox)sender).Text = "";
             }
@@ -79,9 +132,6 @@ namespace SecureTravel
             this.Close();
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
-
-        }
+     
     }
 }
