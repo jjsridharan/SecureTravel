@@ -14,6 +14,8 @@
             <Button Content="Compose" HorizontalAlignment="Left" Margin="-128,58,0,0" VerticalAlignment="Top" Width="75" Click="Compose_Message"/>
             <Label x:Name="Title" Content="INBOX" HorizontalAlignment="Left" Margin="271,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="5.951,1.036" Width="60"/>
             <Button Content="Logout" HorizontalAlignment="Left" Margin="-128,475,0,0" VerticalAlignment="Top" Width="75" Click="Logout"/>
+            <Button Content="New Request" HorizontalAlignment="Left" Margin="-128,100,0,0" VerticalAlignment="Top" Width="75" Click="New_Request"/>
+            <Button Content="View Requests" HorizontalAlignment="Left" Margin="-128,147,0,0" VerticalAlignment="Top" Width="75" Click="View_Requests"/>
 
         </Grid>
     </ScrollViewer>

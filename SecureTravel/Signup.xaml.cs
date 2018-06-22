@@ -7,6 +7,8 @@ using MongoDB.Driver;
 using System.Timers;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace SecureTravel
 {
@@ -19,6 +21,8 @@ namespace SecureTravel
         private IMongoClient Client;
         private IMongoDatabase Database;
         private IMongoCollection<BsonDocument> Collection;
+        private IMongoCollection<BsonDocument> Collection1;
+        private SecurityController securecontroller = new SecurityController();
         private Timer timer = new Timer()
         {
             Interval = 3000 // it will Tick in 3 seconds
@@ -156,9 +160,21 @@ namespace SecureTravel
                 var document = new BsonDocument{
                     { "username" , username},
                     { "mailid" , mailid },
-                    { "password", password }
+                    { "password", Hash(password) }
                 };
                 Collection.InsertOne(document);
+                Collection = Database.GetCollection<BsonDocument>(mailid+"_public_key");
+                Collection1 = Database.GetCollection<BsonDocument>(mailid + "_private_key");
+                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+                for (int i = 0; i < 10; i++)
+                {
+                    string publicPrivateKeyXML = rsa.ToXmlString(true);
+                    string publicOnlyKeyXML = rsa.ToXmlString(false);
+                    document = new BsonDocument { { "id", i+1 },{"key",publicOnlyKeyXML}};
+                    Collection.InsertOne(document);
+                    document = new BsonDocument { { "id", i + 1 }, { "key", securecontroller.Encrypt(password,publicPrivateKeyXML)} };
+                    Collection1.InsertOne(document);
+                }
                 DisplayWarning("Account Successfully Created! Login to send messages");
             }
             else
@@ -166,9 +182,18 @@ namespace SecureTravel
                 DisplayWarning("Mail id already exists");
             }
         }
+
+        private string Hash(string stringToHash)
+        {
+            using (var sha1 = new SHA1Managed())
+            {
+                return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(stringToHash)));
+            }
+        }
         private void User_Signup(object e, RoutedEventArgs senders)
         {
-            DisplayWarning("Processing your request", 300000);
+            warning.Content="Processing your request";
+            warning.Visibility = Visibility.Visible;
             Task.Run(() => Handle());
         }
     }

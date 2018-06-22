@@ -8,13 +8,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Security.Cryptography;
 
 namespace SecureTravel
 {
@@ -47,6 +41,13 @@ namespace SecureTravel
             };
             timer.Start();
         }
+        private string Hash(string stringToHash)
+        {
+            using (var sha1 = new SHA1Managed())
+            {
+                return BitConverter.ToString(sha1.ComputeHash(Encoding.UTF8.GetBytes(stringToHash)));
+            }
+        }
         private void Handle()
         {
             String email = "";
@@ -67,7 +68,7 @@ namespace SecureTravel
             Database = Client.GetDatabase("securetravel");
             Collection = Database.GetCollection<BsonDocument>("user");
             var builder = Builders<BsonDocument>.Filter;
-            var filter = builder.Eq("mailid", email) & builder.Eq("password", password);
+            var filter = builder.Eq("mailid", email) & builder.Eq("password", Hash(password));
             results = Collection.Find(filter).ToList();
             Console.Write(results);
             if (results.Count == 1)
@@ -83,7 +84,8 @@ namespace SecureTravel
         }
         private void Login(object sender, RoutedEventArgs e)
         {
-            DisplayWarning("Processing your request....",30000);
+            warning.Content="Processing your request....";
+            warning.Visibility = Visibility.Visible;
             Task.Run(()=>Handle());           
         }
 
