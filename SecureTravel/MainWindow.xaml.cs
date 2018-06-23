@@ -51,7 +51,7 @@ namespace SecureTravel
         private void Handle()
         {
             String email = "";
-            Email.Dispatcher.Invoke(new Action(() => email = Email.Text));
+            Email.Dispatcher.Invoke(new Action(() => email = Email.Text.ToLower()));
             String password = "";
             TPassword.Dispatcher.Invoke(new Action(() => password = TPassword.Password));
             if (SecureTravel.Signup.IsValidEmail(email) == false)
@@ -70,10 +70,9 @@ namespace SecureTravel
             var builder = Builders<BsonDocument>.Filter;
             var filter = builder.Eq("mailid", email) & builder.Eq("password", Hash(password));
             results = Collection.Find(filter).ToList();
-            Console.Write(results);
             if (results.Count == 1)
             {
-                this.Dispatcher.Invoke(new Action(()=>afterlogin = new AfterLogin(email, password)));
+                this.Dispatcher.Invoke(new Action(()=>afterlogin = new AfterLogin(email, password,results[0]["username"].ToString())));
                 afterlogin.Dispatcher.Invoke(new Action(() => afterlogin.Show()));
                 this.Dispatcher.Invoke(new Action(() => this.Close()));                
             }
@@ -101,7 +100,6 @@ namespace SecureTravel
         private void Password_Lost_Focus(object sender, RoutedEventArgs e)
         {
             String password=TPassword.Password;
-            Console.WriteLine(password);
             if(password.Equals(""))
             {
                 Password.Visibility = System.Windows.Visibility.Visible;

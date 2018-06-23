@@ -11,12 +11,11 @@
         <Grid>
         <Button Content="Return Inbox" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="75" Click="Return_Inbox"/>
         <Label Content="Compose Message" HorizontalAlignment="Left" Margin="327,9,0,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalContentAlignment="Stretch" FontSize="20" FontWeight="ExtraLight" Height="28" Margin="113,35,9.6,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="To" GotFocus="To_Got_Focus" LostFocus="To_Lost_Focus"/>
+        <TextBox x:Name="to_address" HorizontalContentAlignment="Stretch" FontSize="20" FontWeight="ExtraLight" Height="28" Margin="113,35,9.6,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="To" GotFocus="To_Got_Focus" LostFocus="To_Lost_Focus"/>
         <TextBox x:Name="subject" HorizontalContentAlignment="Stretch" FontSize="20" FontWeight="ExtraLight" Height="28" Margin="113,76,9.6,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Subject" GotFocus="Subject_Got_Focus" LostFocus="Subject_Lost_Focus"/>
         <TextBox x:Name="original_message"  Text="Your Message goes here..." TextWrapping="Wrap" AcceptsReturn="True" HorizontalContentAlignment="Stretch" Height="200" Margin="113,120,13.6,0" VerticalAlignment="Top" GotFocus="Message_Got_Focus" LostFocus="Message_Lost_Focus"/>
-        <TextBox x:Name="encrypted_message" Visibility="Hidden" TextWrapping="Wrap" AcceptsReturn="True" HorizontalContentAlignment="Stretch" Height="200" Margin="113,343,13.6,-37.4" VerticalAlignment="Top" IsReadOnly="True"/>
         <Button x:Name="encrypt_button" Content="Encrypt and Send" HorizontalAlignment="Left" Margin="10,186,0,0" VerticalAlignment="Top" Width="98" Click="Encrypt_Message"/>
-        <Button x:Name="send_button" Content="Send" Visibility="Hidden" HorizontalAlignment="Left" Margin="10,394,0,0" VerticalAlignment="Top" Width="75" Click="Send_Message"/>
+        <Label Visibility="Hidden" x:Name="warning" Content="" HorizontalAlignment="Left" Margin="113,343,0,0" VerticalAlignment="Top"/>
         </Grid>
     </ScrollViewer>
 </Window>

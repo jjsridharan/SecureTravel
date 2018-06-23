@@ -9,13 +9,13 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <Grid>
             <Button Content="Return Inbox" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
-            <TextBox x:Name="encryptedcontent" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" HorizontalContentAlignment="Stretch" Height="200" Margin="117,58,9.333,0" VerticalAlignment="Top" />
-            <Label Content="Encrypted Content" HorizontalAlignment="Left" Margin="119,15,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.334,0.19"/>
-            <Label Content="Original Message" HorizontalAlignment="Left" Margin="119,263,0,0" VerticalAlignment="Top"/>
-            <TextBox TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" HorizontalContentAlignment="Stretch" Height="200" Margin="119,294,7.333,0" VerticalAlignment="Top"/>
+            <Label Content="Inbox Message" HorizontalAlignment="Left" Margin="358,21,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.334,0.19"/>
+            <Label x:Name="from_address" Content="From :" HorizontalAlignment="Left" Margin="119,59,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="Message" TextWrapping="Wrap" AcceptsReturn="True" IsReadOnly="True" HorizontalContentAlignment="Stretch" Height="200" Margin="119,150,6.333,0" VerticalAlignment="Top"/>
             <Button Content="Delete" Click="Delete_Mail" HorizontalAlignment="Left" Margin="10,174,0,0" VerticalAlignment="Top" Width="75"/>
             <Button Content="Forward" HorizontalAlignment="Left" Margin="10,129,0,0" VerticalAlignment="Top" Width="75" Click="Forward_Mail"/>
             <Label Content="Mail Options" HorizontalAlignment="Left" Margin="10,88,0,0" VerticalAlignment="Top" Width="84" />
+            <Label x:Name="subject" Content="Subject :" HorizontalAlignment="Left" Margin="119,96,0,0" VerticalAlignment="Top" Width="103"/>
         </Grid>
     </ScrollViewer>
 </Window>

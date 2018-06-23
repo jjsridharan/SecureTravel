@@ -19,7 +19,7 @@ namespace SecureTravel
         private OpenMessage openmessage;
         private AfterLogin currentwindow;
         private ComposeMessage composemessage;
-        String email, password;
+        String email, password,username;
         private static IMongoClient Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");        
         private IMongoDatabase Database = Client.GetDatabase("securetravel");
         private IMongoCollection<BsonDocument> Collection;
@@ -30,24 +30,28 @@ namespace SecureTravel
         Button[] arequests;
         Button[] rrequests;
         int requestscount=0;
-        public AfterLogin(String email, String password)
+        public AfterLogin(String email, String password,String username)
         {
             InitializeComponent();
             for (int i = 0; i < 10; ++i)
             {
                 obutton[i] = new Button();
-                obutton[i].Content = "From : JJSri" + i * 10 + "@gmail.com";
+                obutton[i].Tag = i+1;
+                obutton[i].Content = "";
                 obutton[i].BorderThickness = new Thickness(0);
                 obutton[i].Background = Brushes.Transparent;
                 obutton[i].Margin = new Thickness(36, 61 + i * 48, 0, 0);
                 obutton[i].HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 obutton[i].VerticalAlignment = VerticalAlignment.Top;
-                obutton[i].Click += action_clicked;
-                this.email = email;
-                this.password = password;
+                obutton[i].Click += Open_Message;
+                obutton[i].Visibility = Visibility.Hidden;
                 this.grid.Children.Add(obutton[i]);
             }
+            this.email = email;
+            this.password = password;
+            userlabel.Content = "Hi "+username;
             GetRequests();
+            GetMessages();
         }
         private void DeleteRequests()
         {
@@ -56,6 +60,22 @@ namespace SecureTravel
                 this.grid.Children.Remove(requests[i]);
                 this.grid.Children.Remove(arequests[i]);
                 this.grid.Children.Remove(rrequests[i]);
+            }
+        }
+        private void GetMessages()
+        {
+            Collection = Database.GetCollection<BsonDocument>(email + "_messages");
+            results = Collection.Find(new BsonDocument()).ToList();
+            int i = 9;
+            foreach (var document in results)
+            {
+                if(document["from"].ToString().Equals("")==false)
+                {
+                    obutton[i].Content = "From :" + document["from"].ToString() + "\t\t Subject :" + document["subject"].ToString();
+                    obutton[i].Visibility = Visibility.Visible;
+                    obutton[i].Tag = document["id"].ToInt32();
+                }
+                i--;
             }
         }
         private void GetRequests()
@@ -104,11 +124,11 @@ namespace SecureTravel
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void action_clicked(object sender, RoutedEventArgs e)
+        private void Open_Message(object sender, RoutedEventArgs e)
         {
             currentwindow = this;
             currentwindow.Hide();
-            openmessage = new OpenMessage(email,password,currentwindow);
+            openmessage = new OpenMessage(email,password,currentwindow,((Button)sender).Tag.ToString());
             openmessage.Show();
         }
         private void HandleAcceptRequest(String mailid)
@@ -212,7 +232,7 @@ namespace SecureTravel
         private void Handle()
         {
             String mailid = "";
-            new_request_mailid.Dispatcher.Invoke(new Action(() => mailid = new_request_mailid.Text));
+            new_request_mailid.Dispatcher.Invoke(new Action(() => mailid = new_request_mailid.Text.ToLower()));
             if (mailid.Equals(email) || IsValidEmail(mailid) == false)
             {
                 DisplayWarning("Cannot send request to entered mail id");
@@ -223,18 +243,23 @@ namespace SecureTravel
             var filter = builder.Eq("mailid", mailid);
             results = Collection.Find(filter).ToList();
             if (results.Count == 1)
-            {
-                
-                Collection = Database.GetCollection<BsonDocument>(email + "_requests");
-                filter = builder.Eq("mailid", mailid);
+            {                
+                Collection = Database.GetCollection<BsonDocument>(email + "_requests");               
                 results = Collection.Find(filter).ToList();
                 if (results.Count == 1)
                 {
                     DisplayWarning("Request already sent. View requests to accept!");
                     return;
                 }
+                Collection = Database.GetCollection<BsonDocument>(email + "_friends");                
+                results = Collection.Find(filter).ToList();
+                if (results.Count == 1)
+                {
+                    DisplayWarning("You are already friends!");
+                    return;
+                }
                 Collection = Database.GetCollection<BsonDocument>(mailid + "_requests");
-                filter = builder.Eq("mailid", email);
+                filter = builder.Eq("mailid",email);
                 results = Collection.Find(filter).ToList();
                 if (results.Count == 1)
                 {
@@ -267,6 +292,7 @@ namespace SecureTravel
             new_request.Visibility = Visibility.Hidden;
             for (int i = 0; i < 10; i++)
             {
+                if(obutton[i].Content.Equals("")==false)
                 obutton[i].Visibility = Visibility.Visible;
             }
         }

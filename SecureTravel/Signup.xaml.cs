@@ -124,7 +124,7 @@ namespace SecureTravel
             String username = "";
             this.username.Dispatcher.Invoke(new Action(() => username = this.username.Text));
             String mailid = "";
-            this.mailid.Dispatcher.Invoke(new Action(() => mailid = this.mailid.Text));
+            this.mailid.Dispatcher.Invoke(new Action(() => mailid = this.mailid.Text.ToLower()));
             String password = "";
             Opassword.Dispatcher.Invoke(new Action(() => password = Opassword.Password));
             String opassword = "";
@@ -160,11 +160,13 @@ namespace SecureTravel
                 var document = new BsonDocument{
                     { "username" , username},
                     { "mailid" , mailid },
-                    { "password", Hash(password) }
+                    { "password", Hash(password) },
+                    { "count", 1}
                 };
                 Collection.InsertOne(document);
                 Collection = Database.GetCollection<BsonDocument>(mailid+"_public_key");
                 Collection1 = Database.GetCollection<BsonDocument>(mailid + "_private_key");
+                var Messagecollection = Database.GetCollection<BsonDocument>(mailid+"_messages");
                 RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
                 for (int i = 0; i < 10; i++)
                 {
@@ -174,6 +176,8 @@ namespace SecureTravel
                     Collection.InsertOne(document);
                     document = new BsonDocument { { "id", i + 1 }, { "key", securecontroller.Encrypt(password,publicPrivateKeyXML)} };
                     Collection1.InsertOne(document);
+                    document = new BsonDocument { { "id", i + 1 }, { "message", "" },{ "from", "" },{ "subject", "" } };
+                    Messagecollection.InsertOne(document);
                 }
                 DisplayWarning("Account Successfully Created! Login to send messages");
             }
