@@ -7,16 +7,21 @@
         mc:Ignorable="d"
         Title="Secure Travel" Width="800">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-
         <Grid x:Name="grid" Margin="133,0,0.333,0.333">
-
             <Label Content="Hi Sridharan" ToolTip="" HorizontalAlignment="Left" Margin="-128,12,0,0" VerticalAlignment="Top" Width="116"/>
             <Button Content="Compose" HorizontalAlignment="Left" Margin="-128,58,0,0" VerticalAlignment="Top" Width="75" Click="Compose_Message"/>
             <Label x:Name="Title" Content="INBOX" HorizontalAlignment="Left" Margin="271,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="5.951,1.036" Width="60"/>
             <Button Content="Logout" HorizontalAlignment="Left" Margin="-128,475,0,0" VerticalAlignment="Top" Width="75" Click="Logout"/>
-            <Button Content="New Request" HorizontalAlignment="Left" Margin="-128,100,0,0" VerticalAlignment="Top" Width="75" Click="New_Request"/>
-            <Button Content="View Requests" HorizontalAlignment="Left" Margin="-128,147,0,0" VerticalAlignment="Top" Width="75" Click="View_Requests"/>
+            <Button Content="New Request" HorizontalAlignment="Left" Margin="-128,152,0,0" VerticalAlignment="Top" Width="75" Click="New_Request"/>
+            <Button x:Name="Viewrequest" Content="View Requests" HorizontalAlignment="Left" Margin="-128,204,0,0" VerticalAlignment="Top" Width="75" Click="View_Requests"/>
+            <TextBox x:Name="new_request_mailid" HorizontalAlignment="Left" Height="35" Margin="204,85,0,0" TextWrapping="Wrap" Text="Friend's Mail Id" VerticalAlignment="Top" Width="273" FontSize="20" FontWeight="ExtraLight" RenderTransformOrigin="-0.207,-0.023" GotFocus="New_request_got_focus" LostFocus="New_request_lost_focus" Visibility="Hidden"/>
+            <Button x:Name="new_request" Background="DarkGray" Content="Send Request" HorizontalAlignment="Left" Margin="256,152,0,0" VerticalAlignment="Top" Width="75" Click="Send_Request" Visibility="Hidden"/>
+            <Label x:Name="warning" Content="" HorizontalAlignment="Left" Margin="204,238,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
+            <Button Content="Inbox" HorizontalAlignment="Left" Margin="-128,105,0,0" VerticalAlignment="Top" Width="75" Click="Inbox"/>
+
 
         </Grid>
+        
     </ScrollViewer>
+    
 </Window>
