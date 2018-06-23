@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SecureTravel
 {
@@ -21,11 +17,14 @@ namespace SecureTravel
     {
         private AfterLogin previouswindow;
         private SecurityController securecontroller = new SecurityController();
-        String username, password;
-        public ComposeMessage(String username,String password,AfterLogin prev_window, String subject = "Subject", String content = "Your Message goes here...")
+        String email, password;
+        private static IMongoClient Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
+        private IMongoDatabase Database = Client.GetDatabase("securetravel");
+        private IMongoCollection<BsonDocument> Collection;
+        public ComposeMessage(String email,String password,AfterLogin prev_window, String subject = "Subject", String content = "Your Message goes here...")
         {
             InitializeComponent();
-            this.username = username;
+            this.email = email;
             this.password = password;
             original_message.Text = content;
             this.subject.Text = subject;
@@ -92,34 +91,71 @@ namespace SecureTravel
             }
         }
 
-        private void Encrypt_Message(object sender, RoutedEventArgs e)
+        private void DisplayWarning(String message, int Interval = 3000)
         {
-            if (((Button)sender).Content.Equals("Encrypt and Send") == true)
+            Timer timer = new Timer();
+            timer.Interval = Interval;
+            warning.Dispatcher.Invoke(new Action(() => warning.Content = message));
+            warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Visible));
+            timer.Elapsed += (s, en) => {
+                warning.Dispatcher.Invoke(new Action(() => warning.Visibility = Visibility.Hidden));
+                timer.Stop();
+            };
+            timer.Start();
+        }
+        private void Handle(String mailid,String message,String subject)
+        {
+            Collection = Database.GetCollection<BsonDocument>("user");
+            var builder = Builders<BsonDocument>.Filter;
+            var filter = builder.Eq("mailid", mailid);
+            var results = Collection.Find(filter).ToList();
+            if (results.Count == 1)
             {
-                if((original_message.Text).Equals("Your Message goes here...") ==true)
-                {
-                    //Type message alert
-                    return;
-                }
-                original_message.IsReadOnly = true;
-                String encrypted=securecontroller.Encrypt(password, original_message.Text);
-                encrypted_message.Visibility = Visibility.Visible;
-                encrypted_message.Text = encrypted;
-                send_button.Visibility = Visibility.Visible;
-                encrypt_button.Content = "Edit";
+                var res = results[0];
+                int count = res["count"].ToInt32();
+                Collection.UpdateOne(filter, Builders<BsonDocument>.Update.Set("count", count+1));
+                Collection = Database.GetCollection<BsonDocument>(mailid + "_public_key");
+                builder = Builders<BsonDocument>.Filter;
+                filter = builder.Eq("id", count);
+                results = Collection.Find(filter).ToList();
+                res = results[0];
+                string public_key = res["key"].ToString();
+                RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+                rsa.FromXmlString(public_key);
+                byte[] encrypted = rsa.Encrypt(Encoding.ASCII.GetBytes(message),false);
+                Collection = Database.GetCollection<BsonDocument>(mailid + "_messages");
+                Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("id", count), Builders<BsonDocument>.Update.Set("message", encrypted).Set("from",email).Set("subject",subject));
+                DisplayWarning("Message sent successfully");
             }
             else
             {
-                original_message.IsReadOnly = false;
-                encrypted_message.Visibility = Visibility.Hidden;
-                send_button.Visibility = Visibility.Hidden;
-                encrypt_button.Content = "Encrypt and Send";
+                DisplayWarning("Mail id doesn't exists!");
             }
         }
-
-        private void Send_Message(object sender, RoutedEventArgs e)
+        private void Encrypt_Message(object sender, RoutedEventArgs e)
         {
-            //Send Logic
+           warning.Content = "Processing Request";
+           warning.Visibility = Visibility.Visible;
+           String message = original_message.Text;
+           if (message.Equals("Your Message goes here...") ==true)
+           {
+               DisplayWarning("Please enter message...");
+               return;
+           }
+           original_message.IsReadOnly = true;
+           String to_address = this.to_address.Text;
+           String subject = this.subject.Text;
+           if(to_address.Equals(email))
+            {
+                DisplayWarning("Cannot send mail to entered mail id");
+                return;
+            }
+           if(subject.Length > 100)
+            {
+                DisplayWarning("Subject Message too long");
+                return;
+            }
+           Task.Run(() => Handle(to_address,message,subject));
         }
     }
 }
