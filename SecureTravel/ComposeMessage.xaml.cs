@@ -105,7 +105,7 @@ namespace SecureTravel
         }
         private void Handle(String mailid,String message,String subject)
         {
-            Collection = Database.GetCollection<BsonDocument>("user");
+            Collection = Database.GetCollection<BsonDocument>(email+"_friends");
             var builder = Builders<BsonDocument>.Filter;
             var filter = builder.Eq("mailid", mailid);
             var results = Collection.Find(filter).ToList();
@@ -129,7 +129,7 @@ namespace SecureTravel
             }
             else
             {
-                DisplayWarning("To address not valid!");
+                DisplayWarning("User doesn't exist in your friend list");
             }
         }
         private void Encrypt_Message(object sender, RoutedEventArgs e)
@@ -145,7 +145,7 @@ namespace SecureTravel
            original_message.IsReadOnly = true;
            String to_address = this.to_address.Text;
            String subject = this.subject.Text;
-           if(to_address.Equals(email))
+           if(to_address.Equals(email) || to_address.Equals("To"))
             {
                 DisplayWarning("Cannot send mail to entered mail id");
                 return;
