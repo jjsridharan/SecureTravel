@@ -29,7 +29,9 @@ namespace SecureTravel
         Label[] requests;
         Button[] arequests;
         Button[] rrequests;
-        int requestscount=0;
+        Label[] friends;
+        Button[] dfriend;
+        int requestscount=0,friendscount=0;
         public AfterLogin(String email, String password,String username)
         {
             InitializeComponent();
@@ -48,9 +50,11 @@ namespace SecureTravel
             }
             this.email = email;
             this.password = password;
+            this.username = username;
             userlabel.Content = "Hi "+username;
             GetRequests();
             GetMessages();
+            GetFriends();
         }
         private void DeleteRequests()
         {
@@ -59,6 +63,14 @@ namespace SecureTravel
                 this.grid.Children.Remove(requests[i]);
                 this.grid.Children.Remove(arequests[i]);
                 this.grid.Children.Remove(rrequests[i]);
+            }
+        }
+        private void DeleteFriends()
+        {
+            for (int i = 0; i < friendscount; i++)
+            {
+                this.grid.Children.Remove(friends[i]);
+                this.grid.Children.Remove(dfriend[i]);
             }
         }
         private void GetMessages()
@@ -79,6 +91,7 @@ namespace SecureTravel
                 i--;
             }
         }
+
         private void GetRequests()
         {
             Collection = Database.GetCollection<BsonDocument>(email+"_requests");
@@ -117,7 +130,39 @@ namespace SecureTravel
                 rrequests[i].Visibility = Visibility.Hidden;
                 rrequests[i].Click += DeleteRequest;
                 this.grid.Children.Add(rrequests[i]);
-                Console.Write("Hello");
+                i++;
+            }
+        }
+
+        private void GetFriends()
+        {
+            Collection = Database.GetCollection<BsonDocument>(email + "_friends");
+            results = Collection.Find(new BsonDocument()).ToList();
+            friends = new Label[results.Count];
+            dfriend = new Button[results.Count];
+            friendscount = results.Count;
+            int i = 0;
+            foreach (var request in results)
+            {
+                friends[i] = new Label();
+                friends[i].Content = request["mailid"].ToString();
+                friends[i].Margin = new Thickness(58, 67 + i * 58, 0, 0);
+                friends[i].HorizontalAlignment = HorizontalAlignment.Left;
+                friends[i].VerticalAlignment = VerticalAlignment.Top;
+                friends[i].Width = 372;
+                friends[i].Visibility = Visibility.Hidden;
+                this.grid.Children.Add(friends[i]);                
+                dfriend[i] = new Button();
+                dfriend[i].Tag = i;
+                dfriend[i].Content = "Delete";
+                dfriend[i].Margin = new Thickness(557, 67 + i * 58, 0, 0);
+                dfriend[i].HorizontalAlignment = HorizontalAlignment.Left;
+                dfriend[i].VerticalAlignment = VerticalAlignment.Top;
+                dfriend[i].Width = 75;
+                dfriend[i].Visibility = Visibility.Hidden;
+                dfriend[i].Click += DeleteFriend;
+                this.grid.Children.Add(dfriend[i]);
+                i++;
             }
         }
         /// <summary>
@@ -149,12 +194,34 @@ namespace SecureTravel
             this.Dispatcher.Invoke(new Action(()=>GetRequests()));
             this.Dispatcher.Invoke(new Action(() => View_Requests(new object(),new RoutedEventArgs())));
         }
+
+        private void DeleteFriendfromDB(String mailid)
+        {
+            Collection = Database.GetCollection<BsonDocument>(mailid + "_friends");
+            var document = new BsonDocument { { "mailid", email } };
+            Collection.DeleteOne(document);
+            Collection = Database.GetCollection<BsonDocument>(email + "_friends");
+            document = new BsonDocument { { "mailid", mailid } };
+            Collection.DeleteOne(document);
+            DisplayWarning("Succssfully deleted!");
+            this.Dispatcher.Invoke(new Action(() => DeleteFriends()));
+            this.Dispatcher.Invoke(new Action(() => GetFriends()));
+            this.Dispatcher.Invoke(new Action(() => Friends(new object(), new RoutedEventArgs())));
+        }
+
         private void AcceptRequest(object sender, RoutedEventArgs e)
         {
             String mailid = (string)requests[(int)((Button)sender).Tag].Content;
             warning.Content = "Processsing your request";
             warning.Visibility = Visibility.Visible;
             Task.Run(() => HandleAcceptRequest(mailid));
+        }
+        private void DeleteFriend(object sender, RoutedEventArgs e)
+        {
+            String mailid = (string)friends[(int)((Button)sender).Tag].Content;
+            warning.Content = "Processsing your request";
+            warning.Visibility = Visibility.Visible;
+            Task.Run(() => DeleteFriendfromDB(mailid));
         }
         private void DeleteRequest(object sender, RoutedEventArgs e)
         {
@@ -181,13 +248,19 @@ namespace SecureTravel
 
         private void View_Requests(object sender, RoutedEventArgs e)
         {
+            Title.Content = "View Friend Requests";
             for (int i = 0; i < 10; i++)
             {
                 obutton[i].Visibility = Visibility.Hidden;
             }
             new_request.Visibility = Visibility.Hidden;
             new_request_mailid.Visibility = Visibility.Hidden;
-            for(int i=0;i<requestscount; i++)
+            for (int i = 0; i < friendscount; i++)
+            {
+                friends[i].Visibility = Visibility.Hidden;
+                dfriend[i].Visibility = Visibility.Hidden;
+            }
+            for (int i=0;i<requestscount; i++)
             {
                 requests[i].Visibility = Visibility.Visible;
                 arequests[i].Visibility = Visibility.Visible;
@@ -210,7 +283,8 @@ namespace SecureTravel
         }
         private void New_Request(object sender, RoutedEventArgs e)
         {
-            for(int i=0;i<10;i++)
+            Title.Content = "New Friend Request";
+            for (int i=0;i<10;i++)
             {              
                 obutton[i].Visibility = Visibility.Hidden;
             }
@@ -219,6 +293,11 @@ namespace SecureTravel
                 requests[i].Visibility = Visibility.Hidden;
                 arequests[i].Visibility = Visibility.Hidden;
                 rrequests[i].Visibility = Visibility.Hidden;
+            }
+            for (int i = 0; i < friendscount; i++)
+            {
+                friends[i].Visibility = Visibility.Hidden;
+                dfriend[i].Visibility = Visibility.Hidden;
             }
             new_request_mailid.Visibility = Visibility.Visible;
             new_request.Visibility = Visibility.Visible;
@@ -237,6 +316,7 @@ namespace SecureTravel
             if (mailid.Equals(email) || IsValidEmail(mailid) == false)
             {
                 DisplayWarning("Cannot send request to entered mail id");
+                this.new_request.Dispatcher.Invoke(new Action(() => new_request.IsEnabled = true));
                 return;
             }            
             Collection = Database.GetCollection<BsonDocument>("user");
@@ -250,6 +330,7 @@ namespace SecureTravel
                 if (results.Count == 1)
                 {
                     DisplayWarning("Request already sent. View requests to accept!");
+                    this.new_request.Dispatcher.Invoke(new Action(() => new_request.IsEnabled = true));
                     return;
                 }
                 Collection = Database.GetCollection<BsonDocument>(email + "_friends");                
@@ -257,6 +338,7 @@ namespace SecureTravel
                 if (results.Count == 1)
                 {
                     DisplayWarning("You are already friends!");
+                    this.new_request.Dispatcher.Invoke(new Action(() => new_request.IsEnabled = true));
                     return;
                 }
                 Collection = Database.GetCollection<BsonDocument>(mailid + "_requests");
@@ -265,38 +347,81 @@ namespace SecureTravel
                 if (results.Count == 1)
                 {
                     DisplayWarning("Friend request already sent!");
+                    this.new_request.Dispatcher.Invoke(new Action(() => new_request.IsEnabled = true));
                     return;
                 }
                 var document = new BsonDocument{                 
                     { "mailid" , email }                    
                 };
                 Collection.InsertOne(document);
-                DisplayWarning("Friend request sent successfully!");
+                DisplayWarning("Friend request sent successfully!");                
             }
             else
             {
                 DisplayWarning("Mail id doesn't exists!");
             }
+            this.new_request.Dispatcher.Invoke(new Action(() => new_request.IsEnabled = true));
         }
 
         private void Send_Request(object sender, RoutedEventArgs e)
         {
+            ((Button)sender).IsEnabled = false;
             warning.Content = "Processing your request";
             warning.Visibility = Visibility.Visible;
             Task.Run(() => Handle());
         }
 
         private void Inbox(object sender, RoutedEventArgs e)
-        {           
+        {
+            Title.Content = "Inbox Messages";
             warning.Visibility = Visibility.Hidden;
             new_request_mailid.Visibility = Visibility.Hidden;
             new_request.Visibility = Visibility.Hidden;
+            for (int i = 0; i < requestscount; i++)
+            {
+                requests[i].Visibility = Visibility.Hidden;
+                arequests[i].Visibility = Visibility.Hidden;
+                rrequests[i].Visibility = Visibility.Hidden;
+            }
+            for (int i = 0; i < friendscount; i++)
+            {
+                friends[i].Visibility = Visibility.Hidden;
+                dfriend[i].Visibility = Visibility.Hidden;
+            }
             for (int i = 0; i < 10; i++)
             {
                 if(obutton[i].Content.Equals("")==false)
                     obutton[i].Visibility = Visibility.Visible;
             }
         }
+
+        private void Friends(object sender, RoutedEventArgs e)
+        {
+          
+            Title.Content = "My Friends";
+            warning.Visibility = Visibility.Hidden;
+            new_request_mailid.Visibility = Visibility.Hidden;
+            new_request.Visibility = Visibility.Hidden;
+            for (int i = 0; i < 10; i++)
+            {
+                if(obutton[i].Content.Equals("")==false)
+                    obutton[i].Visibility = Visibility.Hidden;
+            }
+            for (int i = 0; i < requestscount; i++)
+            {
+                requests[i].Visibility = Visibility.Hidden;
+                arequests[i].Visibility = Visibility.Hidden;
+                rrequests[i].Visibility = Visibility.Hidden;
+            }
+            DeleteFriends();
+            GetFriends();
+            for (int i = 0; i < friendscount; i++)
+            {
+                friends[i].Visibility = Visibility.Visible;
+                dfriend[i].Visibility = Visibility.Visible;
+            }
+        }
+
         private void Logout(object sender, RoutedEventArgs e)
         {
             new MainWindow().Show();
