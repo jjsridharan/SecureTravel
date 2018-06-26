@@ -40,7 +40,6 @@ namespace SecureTravel
                 obutton[i].Content = "";
                 obutton[i].BorderThickness = new Thickness(0);
                 obutton[i].Background = Brushes.Transparent;
-                obutton[i].Margin = new Thickness(36, 61 + i * 48, 0, 0);
                 obutton[i].HorizontalContentAlignment = HorizontalAlignment.Stretch;
                 obutton[i].VerticalAlignment = VerticalAlignment.Top;
                 obutton[i].Click += Open_Message;
@@ -66,14 +65,16 @@ namespace SecureTravel
         {
             Collection = Database.GetCollection<BsonDocument>(email + "_messages");
             results = Collection.Find(new BsonDocument()).ToList();
-            int i = 9;
+            int i = 9,j=0;
             foreach (var document in results)
             {
                 if(document["from"].ToString().Equals("")==false)
                 {
+                    obutton[i].Margin = new Thickness(36, 61 + j * 48, 0, 0);
                     obutton[i].Content = "From :" + document["from"].ToString() + "\t\t Subject :" + document["subject"].ToString();
                     obutton[i].Visibility = Visibility.Visible;
                     obutton[i].Tag = document["id"].ToInt32();
+                    j++;
                 }
                 i--;
             }
@@ -128,7 +129,7 @@ namespace SecureTravel
         {
             currentwindow = this;
             currentwindow.Hide();
-            openmessage = new OpenMessage(email,password,currentwindow,((Button)sender).Tag.ToString());
+            openmessage = new OpenMessage(email,password,username, currentwindow, ((Button)sender).Tag.ToString());
             openmessage.Show();
         }
         private void HandleAcceptRequest(String mailid)
@@ -293,7 +294,7 @@ namespace SecureTravel
             for (int i = 0; i < 10; i++)
             {
                 if(obutton[i].Content.Equals("")==false)
-                obutton[i].Visibility = Visibility.Visible;
+                    obutton[i].Visibility = Visibility.Visible;
             }
         }
         private void Logout(object sender, RoutedEventArgs e)

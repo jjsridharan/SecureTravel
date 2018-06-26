@@ -57,11 +57,17 @@ namespace SecureTravel
             if (SecureTravel.Signup.IsValidEmail(email) == false)
             {
                 DisplayWarning("Not a valid Mail id!");
+                this.Dispatcher.Invoke(new Action(() => Loginbt.IsEnabled = true));
+                this.Dispatcher.Invoke(new Action(() => forgotbt.IsEnabled = true));
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
                 return;
             }
             if (password.Equals(""))
             {
-                DisplayWarning("Password is empty!");             
+                DisplayWarning("Password is empty!");
+                this.Dispatcher.Invoke(new Action(() => Loginbt.IsEnabled = true));
+                this.Dispatcher.Invoke(new Action(() => forgotbt.IsEnabled = true));
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
                 return;
             }
             Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
@@ -79,10 +85,16 @@ namespace SecureTravel
             else
             {
                 DisplayWarning("Mail id or Password is wrong");
+                this.Dispatcher.Invoke(new Action(() => Loginbt.IsEnabled = true));
+                this.Dispatcher.Invoke(new Action(() => forgotbt.IsEnabled = true));
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
             }
         }
         private void Login(object sender, RoutedEventArgs e)
         {
+            ((Button)sender).IsEnabled = false;
+            signupbt.IsEnabled = false;
+            forgotbt.IsEnabled = false;
             warning.Content="Processing your request....";
             warning.Visibility = Visibility.Visible;
             Task.Run(()=>Handle());           

@@ -48,8 +48,8 @@ namespace SecureTravel
 
         private void Subject_Got_Focus(object sender, RoutedEventArgs e)
         {
-            String username = ((TextBox)sender).Text;
-            if (username.Equals("Subject") == true)
+            String subject = ((TextBox)sender).Text;
+            if (subject.Equals("Subject") == true)
             {
                 ((TextBox)sender).Text = "";
             }
@@ -57,8 +57,8 @@ namespace SecureTravel
 
         private void Subject_Lost_Focus(object sender, RoutedEventArgs e)
         {
-            String username = ((TextBox)sender).Text;
-            if (username.Equals("") == true)
+            String subject = ((TextBox)sender).Text;
+            if (subject.Equals("") == true)
             {
                 ((TextBox)sender).Text = "Subject";
             }
@@ -66,8 +66,8 @@ namespace SecureTravel
 
         private void Message_Got_Focus(object sender, RoutedEventArgs e)
         {
-            String username = ((TextBox)sender).Text;
-            if (username.Equals("Your Message goes here...") == true)
+            String message = ((TextBox)sender).Text;
+            if (message.Equals("Your Message goes here...") == true)
             {
                 ((TextBox)sender).Text = "";
             }
@@ -75,8 +75,8 @@ namespace SecureTravel
 
         private void Message_Lost_Focus(object sender, RoutedEventArgs e)
         {
-            String username = ((TextBox)sender).Text;
-            if (username.Equals("") == true)
+            String message = ((TextBox)sender).Text;
+            if (message.Equals("") == true)
             {
                 ((TextBox)sender).Text = "Your Message goes here...";
             }
@@ -129,7 +129,7 @@ namespace SecureTravel
             }
             else
             {
-                DisplayWarning("Mail id doesn't exists!");
+                DisplayWarning("To address not valid!");
             }
         }
         private void Encrypt_Message(object sender, RoutedEventArgs e)

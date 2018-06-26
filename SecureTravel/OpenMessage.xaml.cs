@@ -23,18 +23,19 @@ namespace SecureTravel
     public partial class OpenMessage : Window
     {
         private AfterLogin previouswindow;
-        String email, password;
+        String email, password, username;
         int id;
         private SecurityController securecontroller = new SecurityController();
         private static IMongoClient Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
         private IMongoDatabase Database = Client.GetDatabase("securetravel");
         private IMongoCollection<BsonDocument> Collection;
-        public OpenMessage(String email,String password,AfterLogin prev_window,String id)
+        public OpenMessage(String email,String password,String username,AfterLogin prev_window,String id)
         {
             InitializeComponent();
             this.email = email; 
             this.password = password;
             this.id = int.Parse(id);
+            this.username = username;
             previouswindow = prev_window;
             OpenMessageText();
         }
@@ -63,15 +64,26 @@ namespace SecureTravel
             this.Close();
             previouswindow.Show();
         }
-
+        private void Delete_Message()
+        {
+            Collection = Database.GetCollection<BsonDocument>(email + "_messages");
+            var results = Collection.Find(Builders<BsonDocument>.Filter.Eq("id", id)).ToList();
+            if (results.Count == 1)
+            {
+                Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("id", id), Builders<BsonDocument>.Update.Set("from", "").Set("message","").Set("subject",""));
+            }
+        }
         private void Delete_Mail(object sender, RoutedEventArgs e)
         {
+            Delete_Message();
+            this.Close();
+            new AfterLogin(email,password,username).Show();
 
         }
 
         private void Forward_Mail(object sender, RoutedEventArgs e)
         {
-            new ComposeMessage(email, password, previouswindow, "Subject", "Content").Show();
+            new ComposeMessage(email, password, previouswindow, subject.Content.ToString(), Message.Text).Show();
             this.Close();
         }
     }
