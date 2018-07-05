@@ -14,7 +14,7 @@
         <PasswordBox Visibility="Hidden" HorizontalAlignment="Left" Height="35" Margin="187,283,0,0" VerticalAlignment="Top" Width="223"  LostFocus="OCpassword_lost_focus" x:Name="OCpassword"/>
         <TextBox FontSize="20" FontWeight="ExtraLight" RenderTransformOrigin="-0.207,-0.023" HorizontalAlignment="Left" Height="35" Margin="187,220,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="223" GotFocus="password_got_focus" x:Name="Password"/>
         <TextBox FontSize="20" FontWeight="ExtraLight" RenderTransformOrigin="-0.207,-0.023" HorizontalAlignment="Left" Height="35" Margin="187,283,0,0" TextWrapping="Wrap" Text="Confirm Password" VerticalAlignment="Top" Width="223" GotFocus="Cpassword_got_focus" x:Name="CPassword"/>
-        <Button  Content="Signup" Background="DarkGray" HorizontalAlignment="Left" Margin="258,340,0,0" VerticalAlignment="Top" Width="70" RenderTransformOrigin="-0.211,0.334" Click="User_Signup"/>
+        <Button x:Name="signupbt"  Content="Signup" Background="DarkGray" HorizontalAlignment="Left" Margin="258,340,0,0" VerticalAlignment="Top" Width="70" RenderTransformOrigin="-0.211,0.334" Click="User_Signup"/>
         <Button Content="Back to Login" HorizontalAlignment="Left" Margin="-97,39,0,0" VerticalAlignment="Top" Width="80" RenderTransformOrigin="-0.228,0.14" Click="Login"/>
         <Label x:Name="warning" Visibility="Hidden"  Content="Processing Request..." HorizontalAlignment="Left" Margin="187,419,0,0" VerticalAlignment="Top"/>
     </Grid>

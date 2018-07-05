@@ -132,21 +132,25 @@ namespace SecureTravel
             if (username.Equals("Username"))
             {
                 DisplayWarning("Username is empty");
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
                 return;
             }
             if (mailid.Equals("Mail Id") || !IsValidEmail(mailid))
             {
                 DisplayWarning("Mail id Is not valid");
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
                 return;
             }
             if (password.Length < 9)
             {
                 DisplayWarning("password should be atleas eight charcters");
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
                 return;
             }
             if (password.Equals(opassword) == false)
             {
                 DisplayWarning("Password and confirm password are not same");
+                this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
                 return;
             }
             Client = new MongoClient("mongodb://jjsridharan:test123@ds016068.mlab.com:16068/securetravel");
@@ -183,8 +187,9 @@ namespace SecureTravel
             }
             else
             {
-                DisplayWarning("Mail id already exists");
+                DisplayWarning("Account already created with this mail id.");
             }
+            this.Dispatcher.Invoke(new Action(() => signupbt.IsEnabled = true));
         }
 
         private string Hash(string stringToHash)
@@ -198,6 +203,7 @@ namespace SecureTravel
         {
             warning.Content="Processing your request";
             warning.Visibility = Visibility.Visible;
+            signupbt.IsEnabled = false;
             Task.Run(() => Handle());
         }
     }
