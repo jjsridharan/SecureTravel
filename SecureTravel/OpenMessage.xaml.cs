@@ -45,8 +45,8 @@ namespace SecureTravel
             var results = Collection.Find(Builders<BsonDocument>.Filter.Eq("id",id)).ToList();
             if(results.Count==1)
             {
-                from_address.Content = results[0]["from"].ToString();
-                subject.Content = results[0]["subject"].ToString();
+                from_address.Content = "From : " + results[0]["from"].ToString();
+                subject.Content = "Subject : " + results[0]["subject"].ToString();
                 byte[] encrypted = (byte[])results[0]["message"];
                 Collection = Database.GetCollection<BsonDocument>(email + "_private_key");                
                 results = Collection.Find(Builders<BsonDocument>.Filter.Eq("id", id)).ToList();

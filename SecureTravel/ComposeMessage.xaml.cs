@@ -111,6 +111,8 @@ namespace SecureTravel
             var results = Collection.Find(filter).ToList();
             if (results.Count == 1)
             {
+                Collection = Database.GetCollection<BsonDocument>("user");
+                results = Collection.Find(filter).ToList();
                 var res = results[0];
                 int count = res["count"].ToInt32();
                 Collection.UpdateOne(filter, Builders<BsonDocument>.Update.Set("count", count+1));

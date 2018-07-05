@@ -122,6 +122,7 @@ namespace SecureTravel
                 arequests[i].Click += AcceptRequest;
                 this.grid.Children.Add(arequests[i]);
                 rrequests[i] = new Button();
+                rrequests[i].Tag = i;
                 rrequests[i].Content = "Delete";
                 rrequests[i].Margin = new Thickness(557, 67 + i * 58, 0, 0);
                 rrequests[i].HorizontalAlignment = HorizontalAlignment.Left;
@@ -194,7 +195,17 @@ namespace SecureTravel
             this.Dispatcher.Invoke(new Action(()=>GetRequests()));
             this.Dispatcher.Invoke(new Action(() => View_Requests(new object(),new RoutedEventArgs())));
         }
-
+        private void HandleDeleteRequest(String mailid)
+        {
+            Collection = Database.GetCollection<BsonDocument>(email + "_requests");
+            var builder = Builders<BsonDocument>.Filter;
+            var filter = builder.Eq("mailid", mailid);
+            Collection.DeleteOne(filter);
+            DisplayWarning("Succssfully Deleted!");
+            this.Dispatcher.Invoke(new Action(() => DeleteRequests()));
+            this.Dispatcher.Invoke(new Action(() => GetRequests()));
+            this.Dispatcher.Invoke(new Action(() => View_Requests(new object(), new RoutedEventArgs())));
+        }
         private void DeleteFriendfromDB(String mailid)
         {
             Collection = Database.GetCollection<BsonDocument>(mailid + "_friends");
@@ -211,9 +222,12 @@ namespace SecureTravel
 
         private void AcceptRequest(object sender, RoutedEventArgs e)
         {
-            String mailid = (string)requests[(int)((Button)sender).Tag].Content;
+            int requestid = (int)((Button)sender).Tag;
+            String mailid = (string)requests[requestid].Content;
             warning.Content = "Processsing your request";
             warning.Visibility = Visibility.Visible;
+            ((Button)sender).IsEnabled = false;
+            rrequests[requestid].IsEnabled = false;
             Task.Run(() => HandleAcceptRequest(mailid));
         }
         private void DeleteFriend(object sender, RoutedEventArgs e)
@@ -221,11 +235,18 @@ namespace SecureTravel
             String mailid = (string)friends[(int)((Button)sender).Tag].Content;
             warning.Content = "Processsing your request";
             warning.Visibility = Visibility.Visible;
+            ((Button)sender).IsEnabled = false;
             Task.Run(() => DeleteFriendfromDB(mailid));
         }
         private void DeleteRequest(object sender, RoutedEventArgs e)
         {
-            //Delete Friend Request Logic
+            int requestid = (int)(((Button)sender).Tag);
+            String mailid = (string)requests[requestid].Content;
+            warning.Content = "Processsing your request";
+            warning.Visibility = Visibility.Visible;
+            Task.Run(() => HandleDeleteRequest(mailid));
+            ((Button)sender).IsEnabled = false;
+            arequests[requestid].IsEnabled = false;
         }
         private void DisplayWarning(String message, int Interval = 3000)
         {
